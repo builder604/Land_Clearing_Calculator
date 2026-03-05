@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Forestry Mulching Cost Calculator</title>
+  <style>
+    :root {
+      --green-dark: #2d5016;
+      --green-mid: #4a7c2e;
+      --green-light: #6ba34a;
+      --green-pale: #e8f3e0;
+      --orange: #d4862a;
+      --orange-light: #f5e6d0;
+      --gray-dark: #333;
+      --gray-mid: #666;
+      --gray-light: #999;
+      --gray-bg: #f5f5f0;
+      --white: #fff;
+      --red: #c0392b;
+      --border: #ddd;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-bg);
+      color: var(--gray-dark);
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: var(--white);
+      padding: 16px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .app-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .app-header p {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* Section cards */
+    .section {
+      background: var(--white);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .section-header {
+      background: var(--green-pale);
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--green-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--green-dark);
+    }
+    .section-icon {
+      font-size: 18px;
+    }
+    .section-body {
+      padding: 12px 16px;
+    }
+
+    /* Project description */
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 70px;
+      background: var(--gray-bg);
+    }
+    textarea:focus { outline: 2px solid var(--green-light); border-color: transparent; }
+
+    /* Density cards */
+    .level-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .level-card.active {
+      border-color: var(--green-light);
+      box-shadow: 0 0 0 1px var(--green-light);
+    }
+    .level-info {
+      padding: 10px 12px;
+      background: var(--gray-bg);
+    }
+    .level-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 2px;
+    }
+    .level-desc {
+      font-size: 12px;
+      color: var(--gray-mid);
+      margin-bottom: 4px;
+    }
+    .level-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+    }
+    .level-meta span {
+      background: var(--white);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: var(--gray-mid);
+    }
+    .level-meta .price-tag {
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+    .level-inputs {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .level-inputs label {
+      font-size: 12px;
+      color: var(--gray-mid);
+      font-weight: 600;
+    }
+
+    /* Input fields */
+    input[type="number"], input[type="text"], select {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--white);
+      width: 100%;
+    }
+    input[type="number"]:focus, input[type="text"]:focus, select:focus {
+      outline: 2px solid var(--green-light);
+      border-color: transparent;
+    }
+    .input-sm {
+      width: 80px !important;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .subtotal-display {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* Slider for price */
+    .price-slider-row {
+      padding: 4px 12px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .price-slider-row label {
+      font-size: 11px;
+      color: var(--gray-mid);
+      white-space: nowrap;
+    }
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--green-mid);
+      height: 20px;
+    }
+    .price-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-dark);
+      min-width: 55px;
+      text-align: right;
+    }
+
+    /* Trail section */
+    .trail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .trail-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-mid);
+      margin-bottom: 4px;
+    }
+    .trail-calc {
+      background: var(--green-pale);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--green-dark);
+      margin-bottom: 10px;
+    }
+    .trail-calc strong { font-size: 14px; }
+
+    /* Add-on rows */
+    .addon-row {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .addon-row:last-child { border-bottom: none; }
+    .addon-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin-bottom: 2px;
+    }
+    .addon-detail {
+      font-size: 11px;
+      color: var(--gray-mid);
+      margin-bottom: 6px;
+    }
+    .addon-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Mobilization */
+    .mob-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      gap: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .mob-option:last-child { border-bottom: none; }
+    .mob-option input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green-mid);
+    }
+    .mob-option .mob-label {
+      font-size: 13px;
+      flex: 1;
+    }
+    .mob-option .mob-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--green-dark);
+    }
+    .mob-custom-input {
+      display: none;
+      margin-top: 8px;
+    }
+
+    /* Notes */
+    .notes-textarea {
+      min-height: 60px;
+    }
+
+    /* Summary */
+    .summary-section {
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      color: var(--white);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .summary-section h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      font-size: 14px;
+    }
+    .summary-line.total {
+      border-top: 2px solid rgba(255,255,255,0.3);
+      margin-top: 8px;
+      padding-top: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .summary-minimum {
+      text-align: center;
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 8px;
+    }
+
+    /* Export buttons */
+    .export-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-copy {
+      background: var(--green-mid);
+      color: var(--white);
+    }
+    .btn-pdf {
+      background: var(--orange);
+      color: var(--white);
+    }
+    .btn-jpg {
+      background: var(--gray-dark);
+      color: var(--white);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--gray-dark);
+      color: var(--white);
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Important notes */
+    .fine-print {
+      font-size: 11px;
+      color: var(--gray-light);
+      padding: 0 4px 24px;
+      line-height: 1.6;
+    }
+    .fine-print p { margin-bottom: 4px; }
+
+    /* Capture area (for export) */
+    #capture-area .app-header {
+      position: static;
+    }
+
+    /* Reset button */
+    .reset-row {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .btn-reset {
+      background: none;
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 8px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="capture-area">
+  <header class="app-header">
+    <h1>Forestry Mulching Calculator</h1>
+    <p>Land Clearing Cost Estimator</p>
+  </header>
+
+  <div class="container">
+
+    <!-- Project Overview -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128221;</span>
+        <h2>Project Overview</h2>
+      </div>
+      <div class="section-body">
+        <textarea id="projectDesc" placeholder="Brief description of work — area, purpose, access notes..."></textarea>
+      </div>
+    </div>
+
+    <!-- Clearing Density -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#127794;</span>
+        <h2>Clearing Density &amp; Pricing</h2>
+      </div>
+      <div class="section-body" id="levels-container">
+        <!-- Levels injected by JS -->
+      </div>
+    </div>
+
+    <!-- Trail / Path Clearing -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128740;</span>
+        <h2>Trail / Path Clearing</h2>
+      </div>
+      <div class="section-body">
+        <div class="trail-grid">
+          <div class="trail-field">
+            <label>Width (feet)</label>
+            <input type="number" id="trailWidth" min="0" step="1" placeholder="e.g. 12" oninput="calcTrail()">
+          </div>
+          <div class="trail-field">
+            <label>Length</label>
+            <input type="number" id="trailLength" min="0" step="1" placeholder="e.g. 500" oninput="calcTrail()">
+          </div>
+          <div class="trail-field">
+            <label>Length Unit</label>
+            <select id="trailUnit" onchange="calcTrail()">
+              <option value="feet">Feet</option>
+              <option value="miles">Miles</option>
+            </select>
+          </div>
+          <div class="trail-field">
+            <label>Density Level</label>
+            <select id="trailLevel" onchange="calcTrail()">
+              <option value="0">Level 0 – Brush / Field</option>
+              <option value="1" selected>Level 1 – Light</option>
+              <option value="2">Level 2 – Medium</option>
+              <option value="3">Level 3 – Heavy</option>
+              <option value="4">Level 4 – Extreme</option>
+            </select>
+          </div>
+        </div>
+        <div class="trail-calc" id="trailCalc">
+          Calculated area: <strong>0.00 acres</strong> &nbsp;|&nbsp; Trail subtotal: <strong>$0</strong>
+        </div>
+        <div class="price-slider-row">
+          <label>$/acre</label>
+          <input type="range" id="trailPriceSlider" min="350" max="5500" value="850" step="25" oninput="calcTrail()">
+          <span class="price-val" id="trailPriceVal">$850</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add-On Services -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128296;</span>
+        <h2>Add-On Services</h2>
+      </div>
+      <div class="section-body" id="addons-container">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Mobilization -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128666;</span>
+        <h2>Mobilization</h2>
+      </div>
+      <div class="section-body">
+        <label class="mob-option" onclick="setMob(0)">
+          <input type="radio" name="mob" value="0" checked>
+          <span class="mob-label">Within 50 miles of Rocky Mount, NC</span>
+          <span class="mob-price">Included</span>
+        </label>
+        <label class="mob-option" onclick="setMob(150)">
+          <input type="radio" name="mob" value="150">
+          <span class="mob-label">50–100 miles</span>
+          <span class="mob-price">$150</span>
+        </label>
+        <label class="mob-option" onclick="setMob(250)">
+          <input type="radio" name="mob" value="250">
+          <span class="mob-label">100–150 miles</span>
+          <span class="mob-price">$250</span>
+        </label>
+        <label class="mob-option" onclick="setMob(-1)">
+          <input type="radio" name="mob" value="-1">
+          <span class="mob-label">150+ miles (custom)</span>
+          <span class="mob-price">Custom</span>
+        </label>
+        <div class="mob-custom-input" id="mobCustomWrap">
+          <input type="number" id="mobCustom" min="0" step="25" placeholder="Enter mobilization cost" oninput="recalc()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Notes -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">&#128466;</span>
+        <h2>Project Notes / Adjustments</h2>
+      </div>
+      <div class="section-body">
+        <textarea id="projectNotes" class="notes-textarea" placeholder="Access limitations, slopes, wet ground, selective thinning, utilities..."></textarea>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-section" id="summary">
+      <h2>Estimated Project Total</h2>
+      <div class="summary-line"><span>Clearing Subtotal</span><span id="sumClearing">$0</span></div>
+      <div class="summary-line"><span>Trail Clearing</span><span id="sumTrail">$0</span></div>
+      <div class="summary-line"><span>Add-Ons Subtotal</span><span id="sumAddons">$0</span></div>
+      <div class="summary-line"><span>Mobilization</span><span id="sumMob">$0</span></div>
+      <div class="summary-line total"><span>Estimated Total</span><span id="sumTotal">$0</span></div>
+      <p class="summary-minimum">Minimum charge to mobilize equipment: $1,200</p>
+    </div>
+
+    <!-- Export -->
+    <div class="export-bar no-export">
+      <button class="btn btn-copy" onclick="exportCopy()">&#128203; Copy</button>
+      <button class="btn btn-pdf" onclick="exportPDF()">&#128196; PDF</button>
+      <button class="btn btn-jpg" onclick="exportJPG()">&#128247; JPG</button>
+    </div>
+
+    <!-- Important Notes -->
+    <div class="fine-print no-export">
+      <p>* Pricing is based on observed or described site conditions.</p>
+      <p>* Actual production may vary due to density, access, terrain, or unforeseen obstacles.</p>
+      <p>* Extremely dense areas may be billed on a per-day or per-project basis.</p>
+      <p>* Additional work not listed above will require written approval.</p>
+    </div>
+
+    <div class="reset-row no-export">
+      <button class="btn-reset" onclick="resetAll()">Reset Calculator</button>
+    </div>
+
+  </div><!-- container -->
+</div><!-- capture-area -->
+
+<div class="toast" id="toast"></div>
+
+<!-- html2canvas for JPG export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- jsPDF for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+
+<script>
+// ——— DATA ———
+const levels = [
+  { id: 0, name: 'Level 0 – Brush / Field', desc: 'Briars, brush, saplings ≤2"', prod: '3–4 ac/day', min: 350, max: 450 },
+  { id: 1, name: 'Level 1 – Light Mulching', desc: 'Mostly ≤2", some 2–4"', prod: '~1.5 ac/day', min: 850, max: 1000 },
+  { id: 2, name: 'Level 2 – Medium Mulching', desc: 'Mostly 2–4", mixed species', prod: '0.75–1.0 ac/day', min: 1400, max: 1800 },
+  { id: 3, name: 'Level 3 – Heavy Mulching', desc: 'Predominantly 4–6"', prod: '~0.5 ac/day', min: 2600, max: 3000 },
+  { id: 4, name: 'Level 4 – Extreme Density', desc: 'Very dense, vines/blowdowns', prod: '~0.25 ac/day', min: 5000, max: 5500 },
+];
+
+const addons = [
+  { id: 'rake', name: 'Root / Brush Raking', detail: 'Per acre (after mulching)', unit: 'acres', rate: 0, custom: true, placeholder: '$/acre' },
+  { id: 'haul', name: 'Debris Haul-Off', detail: 'Case-by-case', unit: '', rate: 0, custom: true, placeholder: 'Total $' },
+  { id: 'grapple', name: 'Grapple Work', detail: '$175/hr, 4-hr minimum', unit: 'hrs', rate: 175, custom: false },
+  { id: 'stump', name: 'Stump Removal', detail: '$150/stump (~10 min each)', unit: 'stumps', rate: 150, custom: false },
+  { id: 'seed', name: 'Seed & Straw', detail: 'Installed $1,200/acre', unit: 'acres', rate: 1200, custom: false },
+];
+
+let mobCost = 0;
+
+// ——— BUILD LEVEL CARDS ———
+function buildLevels() {
+  const c = document.getElementById('levels-container');
+  levels.forEach(lv => {
+    const mid = Math.round((lv.min + lv.max) / 2);
+    c.innerHTML += `
+      <div class="level-card" id="lc${lv.id}">
+        <div class="level-info">
+          <div class="level-title">${lv.name}</div>
+          <div class="level-desc">${lv.desc}</div>
+          <div class="level-meta">
+            <span>${lv.prod}</span>
+            <span class="price-tag">$${lv.min.toLocaleString()}–$${lv.max.toLocaleString()}/ac</span>
+          </div>
+        </div>
+        <div class="level-inputs">
+          <label>Acres</label>
+          <input type="number" class="input-sm" id="acres${lv.id}" min="0" step="0.25" placeholder="0" oninput="updateLevel(${lv.id})">
+          <span class="subtotal-display" id="sub${lv.id}">$0</span>
+        </div>
+        <div class="price-slider-row">
+          <label>$/acre</label>
+          <input type="range" id="price${lv.id}" min="${lv.min}" max="${lv.max}" value="${mid}" step="25" oninput="updateLevel(${lv.id})">
+          <span class="price-val" id="pv${lv.id}">$${mid.toLocaleString()}</span>
+        </div>
+      </div>`;
+  });
+}
+
+// ——— BUILD ADD-ONS ———
+function buildAddons() {
+  const c = document.getElementById('addons-container');
+  addons.forEach(a => {
+    let inputs = '';
+    if (a.custom) {
+      inputs = `
+        <input type="number" class="input-sm" id="aq_${a.id}" min="0" step="1" placeholder="Qty" oninput="recalcAddons()">
+        <span style="font-size:12px;color:var(--gray-mid)">${a.unit}</span>
+        <span style="font-size:12px;color:var(--gray-mid)">×</span>
+        <input type="number" class="input-sm" id="ar_${a.id}" min="0" step="25" placeholder="${a.placeholder}" oninput="recalcAddons()">
+        <span class="subtotal-display" id="as_${a.id}">$0</span>`;
+    } else {
+      inputs = `
+        <input type="number" class="input-sm" id="aq_${a.id}" min="0" step="${a.id === 'seed' ? '0.25' : '1'}" placeholder="0" oninput="recalcAddons()">
+        <span style="font-size:12px;color:var(--gray-mid)">${a.unit} × $${a.rate.toLocaleString()}</span>
+        <span class="subtotal-display" id="as_${a.id}">$0</span>`;
+    }
+    c.innerHTML += `
+      <div class="addon-row">
+        <div class="addon-name">${a.name}</div>
+        <div class="addon-detail">${a.detail}</div>
+        <div class="addon-inputs">${inputs}</div>
+      </div>`;
+  });
+}
+
+// ——— CALCULATIONS ———
+function updateLevel(id) {
+  const acres = parseFloat(document.getElementById(`acres${id}`).value) || 0;
+  const price = parseInt(document.getElementById(`price${id}`).value);
+  document.getElementById(`pv${id}`).textContent = `$${price.toLocaleString()}`;
+  const sub = acres * price;
+  document.getElementById(`sub${id}`).textContent = `$${sub.toLocaleString()}`;
+  document.getElementById(`lc${id}`).classList.toggle('active', acres > 0);
+  recalc();
+}
+
+function calcTrail() {
+  const w = parseFloat(document.getElementById('trailWidth').value) || 0;
+  let len = parseFloat(document.getElementById('trailLength').value) || 0;
+  const unit = document.getElementById('trailUnit').value;
+  const levelIdx = parseInt(document.getElementById('trailLevel').value);
+  const lv = levels[levelIdx];
+
+  if (unit === 'miles') len = len * 5280;
+  const sqft = w * len;
+  const acres = sqft / 43560;
+
+  // Set slider range to match selected level
+  const slider = document.getElementById('trailPriceSlider');
+  slider.min = lv.min;
+  slider.max = lv.max;
+  let price = parseInt(slider.value);
+  if (price < lv.min) { slider.value = lv.min; price = lv.min; }
+  if (price > lv.max) { slider.value = lv.max; price = lv.max; }
+
+  document.getElementById('trailPriceVal').textContent = `$${price.toLocaleString()}`;
+  const sub = acres * price;
+  document.getElementById('trailCalc').innerHTML =
+    `Calculated area: <strong>${acres.toFixed(2)} acres</strong> &nbsp;|&nbsp; Trail subtotal: <strong>$${Math.round(sub).toLocaleString()}</strong>`;
+  recalc();
+}
+
+function recalcAddons() { recalc(); }
+
+function getAddonTotal() {
+  let total = 0;
+  addons.forEach(a => {
+    const qty = parseFloat(document.getElementById(`aq_${a.id}`).value) || 0;
+    let sub = 0;
+    if (a.custom) {
+      const rate = parseFloat(document.getElementById(`ar_${a.id}`).value) || 0;
+      sub = qty * rate;
+    } else {
+      sub = qty * a.rate;
+    }
+    document.getElementById(`as_${a.id}`).textContent = `$${Math.round(sub).toLocaleString()}`;
+    total += sub;
+  });
+  return total;
+}
+
+function getClearingTotal() {
+  let total = 0;
+  levels.forEach(lv => {
+    const acres = parseFloat(document.getElementById(`acres${lv.id}`).value) || 0;
+    const price = parseInt(document.getElementById(`price${lv.id}`).value);
+    total += acres * price;
+  });
+  return total;
+}
+
+function getTrailTotal() {
+  const w = parseFloat(document.getElementById('trailWidth').value) || 0;
+  let len = parseFloat(document.getElementById('trailLength').value) || 0;
+  const unit = document.getElementById('trailUnit').value;
+  if (unit === 'miles') len = len * 5280;
+  const acres = (w * len) / 43560;
+  const price = parseInt(document.getElementById('trailPriceSlider').value);
+  return acres * price;
+}
+
+function getMob() {
+  if (mobCost === -1) {
+    return parseFloat(document.getElementById('mobCustom').value) || 0;
+  }
+  return mobCost;
+}
+
+function recalc() {
+  const clearing = getClearingTotal();
+  const trail = getTrailTotal();
+  const addonTot = getAddonTotal();
+  const mob = getMob();
+  const total = clearing + trail + addonTot + mob;
+
+  document.getElementById('sumClearing').textContent = `$${Math.round(clearing).toLocaleString()}`;
+  document.getElementById('sumTrail').textContent = `$${Math.round(trail).toLocaleString()}`;
+  document.getElementById('sumAddons').textContent = `$${Math.round(addonTot).toLocaleString()}`;
+  document.getElementById('sumMob').textContent = mob > 0 ? `$${Math.round(mob).toLocaleString()}` : 'Included';
+  document.getElementById('sumTotal').textContent = `$${Math.round(total).toLocaleString()}`;
+}
+
+function setMob(val) {
+  mobCost = val;
+  document.getElementById('mobCustomWrap').style.display = val === -1 ? 'block' : 'none';
+  recalc();
+}
+
+// ——— EXPORT: COPY ———
+function exportCopy() {
+  let text = '=== FORESTRY MULCHING ESTIMATE ===\n\n';
+  const desc = document.getElementById('projectDesc').value.trim();
+  if (desc) text += `Project: ${desc}\n\n`;
+
+  text += '--- CLEARING ---\n';
+  levels.forEach(lv => {
+    const acres = parseFloat(document.getElementById(`acres${lv.id}`).value) || 0;
+    if (acres > 0) {
+      const price = parseInt(document.getElementById(`price${lv.id}`).value);
+      text += `${lv.name}: ${acres} ac × $${price.toLocaleString()}/ac = $${Math.round(acres * price).toLocaleString()}\n`;
+    }
+  });
+
+  const trailAcres = getTrailAcres();
+  if (trailAcres > 0) {
+    const w = document.getElementById('trailWidth').value;
+    const l = document.getElementById('trailLength').value;
+    const u = document.getElementById('trailUnit').value;
+    const tp = parseInt(document.getElementById('trailPriceSlider').value);
+    text += `\n--- TRAIL CLEARING ---\n`;
+    text += `${w}ft wide × ${l} ${u} = ${trailAcres.toFixed(2)} acres × $${tp.toLocaleString()}/ac = $${Math.round(trailAcres * tp).toLocaleString()}\n`;
+  }
+
+  text += '\n--- ADD-ONS ---\n';
+  addons.forEach(a => {
+    const qty = parseFloat(document.getElementById(`aq_${a.id}`).value) || 0;
+    if (qty > 0) {
+      let sub;
+      if (a.custom) {
+        const rate = parseFloat(document.getElementById(`ar_${a.id}`).value) || 0;
+        sub = qty * rate;
+        text += `${a.name}: ${qty} ${a.unit} × $${rate} = $${Math.round(sub).toLocaleString()}\n`;
+      } else {
+        sub = qty * a.rate;
+        text += `${a.name}: ${qty} ${a.unit} × $${a.rate.toLocaleString()} = $${Math.round(sub).toLocaleString()}\n`;
+      }
+    }
+  });
+
+  const mob = getMob();
+  text += `\nMobilization: ${mob > 0 ? '$' + mob.toLocaleString() : 'Included'}\n`;
+
+  const notes = document.getElementById('projectNotes').value.trim();
+  if (notes) text += `\nNotes: ${notes}\n`;
+
+  const total = getClearingTotal() + getTrailTotal() + getAddonTotal() + mob;
+  text += `\n=== ESTIMATED TOTAL: $${Math.round(total).toLocaleString()} ===\n`;
+  text += `Minimum charge to mobilize equipment: $1,200\n`;
+
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+}
+
+function getTrailAcres() {
+  const w = parseFloat(document.getElementById('trailWidth').value) || 0;
+  let len = parseFloat(document.getElementById('trailLength').value) || 0;
+  if (document.getElementById('trailUnit').value === 'miles') len *= 5280;
+  return (w * len) / 43560;
+}
+
+// ——— EXPORT: JPG ———
+function exportJPG() {
+  showToast('Generating image...');
+  const el = document.getElementById('capture-area');
+  // Hide export buttons and reset for capture
+  document.querySelectorAll('.no-export').forEach(e => e.style.display = 'none');
+  html2canvas(el, { scale: 2, backgroundColor: '#f5f5f0', useCORS: true }).then(canvas => {
+    document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
+    const link = document.createElement('a');
+    link.download = 'forestry-estimate.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+    showToast('JPG downloaded!');
+  }).catch(() => {
+    document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
+    showToast('Error generating image');
+  });
+}
+
+// ——— EXPORT: PDF ———
+function exportPDF() {
+  showToast('Generating PDF...');
+  const el = document.getElementById('capture-area');
+  document.querySelectorAll('.no-export').forEach(e => e.style.display = 'none');
+  html2canvas(el, { scale: 2, backgroundColor: '#f5f5f0', useCORS: true }).then(canvas => {
+    document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
+    const { jsPDF } = window.jspdf;
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pageWidth = 210; // A4 mm
+    const imgWidth = pageWidth - 20;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    let y = 10;
+    let remaining = imgHeight;
+    const pageHeight = 287;
+
+    // Handle multi-page
+    if (imgHeight <= pageHeight) {
+      pdf.addImage(imgData, 'JPEG', 10, y, imgWidth, imgHeight);
+    } else {
+      // Tile the image across pages
+      let srcY = 0;
+      while (remaining > 0) {
+        const sliceHeight = Math.min(remaining, pageHeight);
+        // Use full image and position it
+        pdf.addImage(imgData, 'JPEG', 10, y - (imgHeight - remaining), imgWidth, imgHeight);
+        remaining -= pageHeight;
+        if (remaining > 0) {
+          pdf.addPage();
+          y = 0;
+        }
+      }
+    }
+    pdf.save('forestry-estimate.pdf');
+    showToast('PDF downloaded!');
+  }).catch(() => {
+    document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
+    showToast('Error generating PDF');
+  });
+}
+
+// ——— TOAST ———
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ——— RESET ———
+function resetAll() {
+  document.getElementById('projectDesc').value = '';
+  document.getElementById('projectNotes').value = '';
+  levels.forEach(lv => {
+    document.getElementById(`acres${lv.id}`).value = '';
+    const mid = Math.round((lv.min + lv.max) / 2);
+    document.getElementById(`price${lv.id}`).value = mid;
+    document.getElementById(`pv${lv.id}`).textContent = `$${mid.toLocaleString()}`;
+    document.getElementById(`sub${lv.id}`).textContent = '$0';
+    document.getElementById(`lc${lv.id}`).classList.remove('active');
+  });
+  document.getElementById('trailWidth').value = '';
+  document.getElementById('trailLength').value = '';
+  document.getElementById('trailUnit').value = 'feet';
+  document.getElementById('trailLevel').value = '1';
+  document.getElementById('trailPriceSlider').value = 850;
+  document.getElementById('trailPriceVal').textContent = '$850';
+  addons.forEach(a => {
+    document.getElementById(`aq_${a.id}`).value = '';
+    if (a.custom) document.getElementById(`ar_${a.id}`).value = '';
+    document.getElementById(`as_${a.id}`).textContent = '$0';
+  });
+  document.querySelector('input[name="mob"][value="0"]').checked = true;
+  mobCost = 0;
+  document.getElementById('mobCustomWrap').style.display = 'none';
+  document.getElementById('mobCustom').value = '';
+  recalc();
+  calcTrail();
+  showToast('Calculator reset');
+}
+
+// ——— INIT ———
+buildLevels();
+buildAddons();
+recalc();
+calcTrail();
+</script>
+
+</body>
+</html>
