@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Forestry Mulching Cost Calculator</title>
   <meta name="description" content="Land clearing cost estimator for forestry mulching projects">
-  <meta name="theme-color" content="#2d5016">
+  <meta name="theme-color" content="#333333">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Mulch Calc">
@@ -14,19 +14,19 @@
   <link rel="icon" type="image/svg+xml" href="/icons/icon-192.svg">
   <style>
     :root {
-      --green-dark: #2d5016;
-      --green-mid: #4a7c2e;
-      --green-light: #6ba34a;
-      --green-pale: #e8f3e0;
-      --orange: #d4862a;
-      --orange-light: #f5e6d0;
-      --gray-dark: #333;
+      --brand-gold: #E9A830;
+      --brand-gold-dark: #D4952A;
+      --brand-gold-light: #F5DEB3;
+      --brand-gold-pale: #FFF8EC;
+      --brand-flame: #E8632B;
+      --charcoal: #333333;
+      --charcoal-light: #555555;
       --gray-mid: #666;
       --gray-light: #999;
-      --gray-bg: #f5f5f0;
+      --gray-bg: #FAFAFA;
       --white: #fff;
       --red: #c0392b;
-      --border: #ddd;
+      --border: #E0E0E0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,13 +34,13 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--gray-bg);
-      color: var(--gray-dark);
+      color: var(--charcoal);
       line-height: 1.5;
       -webkit-text-size-adjust: 100%;
     }
 
     .app-header {
-      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      background: var(--charcoal);
       color: var(--white);
       padding: 16px 20px;
       text-align: center;
@@ -53,6 +53,7 @@
       font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.5px;
+      color: var(--brand-gold);
     }
     .app-header p {
       font-size: 12px;
@@ -75,9 +76,9 @@
       overflow: hidden;
     }
     .section-header {
-      background: var(--green-pale);
+      background: var(--brand-gold-pale);
       padding: 12px 16px;
-      border-bottom: 2px solid var(--green-light);
+      border-bottom: 2px solid var(--brand-gold);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -85,7 +86,7 @@
     .section-header h2 {
       font-size: 15px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--charcoal);
     }
     .section-icon {
       font-size: 18px;
@@ -106,7 +107,7 @@
       min-height: 70px;
       background: var(--gray-bg);
     }
-    textarea:focus { outline: 2px solid var(--green-light); border-color: transparent; }
+    textarea:focus { outline: 2px solid var(--brand-gold); border-color: transparent; }
 
     /* Density cards */
     .level-card {
@@ -117,8 +118,8 @@
       transition: border-color 0.2s;
     }
     .level-card.active {
-      border-color: var(--green-light);
-      box-shadow: 0 0 0 1px var(--green-light);
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 1px var(--brand-gold);
     }
     .level-info {
       padding: 10px 12px;
@@ -127,7 +128,7 @@
     .level-title {
       font-size: 14px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--charcoal);
       margin-bottom: 2px;
     }
     .level-desc {
@@ -147,7 +148,7 @@
       color: var(--gray-mid);
     }
     .level-meta .price-tag {
-      color: var(--green-dark);
+      color: var(--brand-gold-dark);
       font-weight: 600;
     }
     .level-inputs {
@@ -174,7 +175,7 @@
       width: 100%;
     }
     input[type="number"]:focus, input[type="text"]:focus, select:focus {
-      outline: 2px solid var(--green-light);
+      outline: 2px solid var(--brand-gold);
       border-color: transparent;
     }
     .input-sm {
@@ -188,7 +189,7 @@
     .subtotal-display {
       font-size: 13px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--brand-gold-dark);
       margin-left: auto;
       white-space: nowrap;
     }
@@ -207,13 +208,13 @@
     }
     input[type="range"] {
       flex: 1;
-      accent-color: var(--green-mid);
+      accent-color: var(--brand-gold);
       height: 20px;
     }
     .price-val {
       font-size: 13px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--brand-gold-dark);
       min-width: 55px;
       text-align: right;
     }
@@ -233,11 +234,11 @@
       margin-bottom: 4px;
     }
     .trail-calc {
-      background: var(--green-pale);
+      background: var(--brand-gold-pale);
       padding: 8px 12px;
       border-radius: 8px;
       font-size: 13px;
-      color: var(--green-dark);
+      color: var(--charcoal);
       margin-bottom: 10px;
     }
     .trail-calc strong { font-size: 14px; }
@@ -251,7 +252,7 @@
     .addon-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--gray-dark);
+      color: var(--charcoal);
       margin-bottom: 2px;
     }
     .addon-detail {
@@ -278,7 +279,7 @@
     .mob-option input[type="radio"] {
       width: 18px;
       height: 18px;
-      accent-color: var(--green-mid);
+      accent-color: var(--brand-gold);
     }
     .mob-option .mob-label {
       font-size: 13px;
@@ -287,7 +288,7 @@
     .mob-option .mob-price {
       font-size: 13px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--brand-gold-dark);
     }
     .mob-custom-input {
       display: none;
@@ -301,7 +302,7 @@
 
     /* Summary */
     .summary-section {
-      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      background: var(--charcoal);
       color: var(--white);
       border-radius: 12px;
       padding: 16px;
@@ -319,11 +320,19 @@
       font-size: 14px;
     }
     .summary-line.total {
-      border-top: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid var(--brand-gold);
       margin-top: 8px;
       padding-top: 10px;
       font-size: 18px;
       font-weight: 700;
+      color: var(--brand-gold);
+    }
+    .summary-minimum-applied {
+      text-align: center;
+      font-size: 12px;
+      color: var(--brand-gold);
+      margin-top: 6px;
+      font-weight: 600;
     }
     .summary-minimum {
       text-align: center;
@@ -354,15 +363,15 @@
     }
     .btn:active { transform: scale(0.97); }
     .btn-copy {
-      background: var(--green-mid);
-      color: var(--white);
+      background: var(--brand-gold);
+      color: var(--charcoal);
     }
     .btn-pdf {
-      background: var(--orange);
+      background: var(--charcoal);
       color: var(--white);
     }
     .btn-jpg {
-      background: var(--gray-dark);
+      background: var(--charcoal-light);
       color: var(--white);
     }
 
@@ -372,7 +381,7 @@
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: var(--gray-dark);
+      background: var(--charcoal);
       color: var(--white);
       padding: 10px 24px;
       border-radius: 8px;
@@ -421,8 +430,8 @@
 
 <div id="capture-area">
   <header class="app-header">
-    <h1>Forestry Mulching Calculator</h1>
-    <p>Land Clearing Cost Estimator</p>
+    <h1>Wildwood Eco Solutions</h1>
+    <p>Forestry Mulching &amp; Land Clearing Cost Estimator</p>
   </header>
 
   <div class="container">
@@ -557,7 +566,8 @@
       <div class="summary-line"><span>Add-Ons Subtotal</span><span id="sumAddons">$0</span></div>
       <div class="summary-line"><span>Mobilization</span><span id="sumMob">$0</span></div>
       <div class="summary-line total"><span>Estimated Total</span><span id="sumTotal">$0</span></div>
-      <p class="summary-minimum">Minimum charge to mobilize equipment: $1,200</p>
+      <p class="summary-minimum">Minimum charge to mobilize equipment: $1,000</p>
+      <p class="summary-minimum-applied" id="minApplied" style="display:none">* Minimum charge applied</p>
     </div>
 
     <!-- Export -->
@@ -748,18 +758,24 @@ function getMob() {
   return mobCost;
 }
 
+const MIN_CHARGE = 1000;
+
 function recalc() {
   const clearing = getClearingTotal();
   const trail = getTrailTotal();
   const addonTot = getAddonTotal();
   const mob = getMob();
-  const total = clearing + trail + addonTot + mob;
+  const rawTotal = clearing + trail + addonTot + mob;
+  const hasWork = clearing > 0 || trail > 0 || addonTot > 0;
+  const minApplied = hasWork && rawTotal < MIN_CHARGE;
+  const total = minApplied ? MIN_CHARGE : rawTotal;
 
   document.getElementById('sumClearing').textContent = `$${Math.round(clearing).toLocaleString()}`;
   document.getElementById('sumTrail').textContent = `$${Math.round(trail).toLocaleString()}`;
   document.getElementById('sumAddons').textContent = `$${Math.round(addonTot).toLocaleString()}`;
   document.getElementById('sumMob').textContent = mob > 0 ? `$${Math.round(mob).toLocaleString()}` : 'Included';
   document.getElementById('sumTotal').textContent = `$${Math.round(total).toLocaleString()}`;
+  document.getElementById('minApplied').style.display = minApplied ? 'block' : 'none';
 }
 
 function setMob(val) {
@@ -815,9 +831,12 @@ function exportCopy() {
   const notes = document.getElementById('projectNotes').value.trim();
   if (notes) text += `\nNotes: ${notes}\n`;
 
-  const total = getClearingTotal() + getTrailTotal() + getAddonTotal() + mob;
+  const rawTotal = getClearingTotal() + getTrailTotal() + getAddonTotal() + mob;
+  const hasWork = getClearingTotal() > 0 || getTrailTotal() > 0 || getAddonTotal() > 0;
+  const total = (hasWork && rawTotal < MIN_CHARGE) ? MIN_CHARGE : rawTotal;
+  if (hasWork && rawTotal < MIN_CHARGE) text += `\n* Minimum charge applied\n`;
   text += `\n=== ESTIMATED TOTAL: $${Math.round(total).toLocaleString()} ===\n`;
-  text += `Minimum charge to mobilize equipment: $1,200\n`;
+  text += `Minimum charge to mobilize equipment: $1,000\n`;
 
   navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
 }
@@ -835,7 +854,7 @@ function exportJPG() {
   const el = document.getElementById('capture-area');
   // Hide export buttons and reset for capture
   document.querySelectorAll('.no-export').forEach(e => e.style.display = 'none');
-  html2canvas(el, { scale: 2, backgroundColor: '#f5f5f0', useCORS: true }).then(canvas => {
+  html2canvas(el, { scale: 2, backgroundColor: '#FAFAFA', useCORS: true }).then(canvas => {
     document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
     const link = document.createElement('a');
     link.download = 'forestry-estimate.jpg';
@@ -853,7 +872,7 @@ function exportPDF() {
   showToast('Generating PDF...');
   const el = document.getElementById('capture-area');
   document.querySelectorAll('.no-export').forEach(e => e.style.display = 'none');
-  html2canvas(el, { scale: 2, backgroundColor: '#f5f5f0', useCORS: true }).then(canvas => {
+  html2canvas(el, { scale: 2, backgroundColor: '#FAFAFA', useCORS: true }).then(canvas => {
     document.querySelectorAll('.no-export').forEach(e => e.style.display = '');
     const { jsPDF } = window.jspdf;
     const imgData = canvas.toDataURL('image/jpeg', 0.92);
